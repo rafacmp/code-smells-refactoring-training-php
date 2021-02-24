@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\core\Employee;
-use App\core\OurDate;
 use helpers\OurDateFactory;
 use PHPUnit\Framework\TestCase;
 

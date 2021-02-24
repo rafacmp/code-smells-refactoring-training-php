@@ -4,8 +4,6 @@
 namespace App\core;
 
 
-use phpDocumentor\Reflection\Types\This;
-
 class GreetingMessage
 {
     private string $to;
