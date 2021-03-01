@@ -22,16 +22,6 @@ class OurDate
         }
     }
 
-    public function getDay(): int
-    {
-        return (int)$this->date->format('d');
-    }
-
-    public function getMonth(): int
-    {
-        return (int)$this->date->format('m');
-    }
-
     public function isSameDay($anotherDate): bool
     {
         return
@@ -39,12 +29,14 @@ class OurDate
             && $anotherDate->getMonth() === $this->getMonth();
     }
 
-    public function equals($ourDate): bool
+    private function getDay(): int
     {
-        if (!($ourDate instanceof OurDate)) {
-            return false;
-        }
-
-        return $ourDate->date->getTimestamp() === $this->date->getTimestamp();
+        return (int)$this->date->format('d');
     }
+
+    private function getMonth(): int
+    {
+        return (int)$this->date->format('m');
+    }
+
 }
