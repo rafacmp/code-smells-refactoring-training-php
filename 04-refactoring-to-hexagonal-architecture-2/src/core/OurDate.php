@@ -25,21 +25,12 @@ class OurDate
             && $anotherDate->getMonth() === $this->getMonth();
     }
 
-    public function equals($ourDate): bool
-    {
-        if (!($ourDate instanceof OurDate)) {
-            return false;
-        }
-
-        return $ourDate->date->getTimestamp() === $this->date->getTimestamp();
-    }
-
-    public function getDay(): int
+    private function getDay(): int
     {
         return (int)$this->date->format('d');
     }
 
-    public function getMonth(): int
+    private function getMonth(): int
     {
         return (int)$this->date->format('m');
     }

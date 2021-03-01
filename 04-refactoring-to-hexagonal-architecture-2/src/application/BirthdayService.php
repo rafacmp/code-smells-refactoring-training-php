@@ -41,15 +41,16 @@ class BirthdayService
 
     private function employeesHavingBirthday($today): array
     {
-        return $this->employeeRepository->whoseBirthdayIs($today);
+        return $this->employeeRepository->employeesWhoseBirthdayIs($today);
     }
 
     protected function send(array $messages, string $smtpHost, int $smtpPort, string $sender)
     {
+        /** @var GreetingMessage $message */
         foreach($messages as $message) {
-            $recipient = $message->to();
-            $body = $message->text();
-            $subject = $message->subject();
+            $recipient = $message->getTo();
+            $body = $message->getText();
+            $subject = $message->getSubject();
             $this->trySendMessage($smtpHost, $smtpPort, $sender, $subject, $body, $recipient);
         }
     }

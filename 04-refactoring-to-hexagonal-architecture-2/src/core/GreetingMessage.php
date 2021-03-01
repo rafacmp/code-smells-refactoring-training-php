@@ -9,7 +9,7 @@ class GreetingMessage
     private string $to;
     private Greeting $greeting;
 
-    public function __construct(string $to, Greeting $greeting)
+    private function __construct(string $to, Greeting $greeting)
     {
         $this->to = $to;
         $this->greeting = $greeting;
@@ -17,27 +17,27 @@ class GreetingMessage
 
     public static function generateForSome(array $employees): array
     {
-        return array_map('self::generateFor', $employees);
+        return array_map(
+            function ($employee) {
+                $greeting = Greeting::forBirthdayOf($employee);
+                $recipient = $employee->getEmail();
+                return new GreetingMessage($recipient, $greeting);
+            },
+            $employees
+        );
     }
 
-    public static function generateFor(Employee $employee): GreetingMessage
+    public function getSubject(): string
     {
-       $greeting = Greeting::forBirthdayOf($employee);
-       $recipient = $employee->email();
-       return new GreetingMessage($recipient, $greeting);
+        return $this->greeting->getHeader();
     }
 
-    public function subject(): string
+    public function getText(): string
     {
-        return $this->greeting->header();
+        return $this->greeting->getContent();
     }
 
-    public function text(): string
-    {
-        return $this->greeting->content();
-    }
-
-    public function to(): string
+    public function getTo(): string
     {
         return $this->to;
     }

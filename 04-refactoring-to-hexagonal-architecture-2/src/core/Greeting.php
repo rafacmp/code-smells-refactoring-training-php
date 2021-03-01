@@ -15,19 +15,19 @@ class Greeting
         $this->content = $content;
     }
 
-    public static function forBirthdayOf(Employee $employee)
+    public static function forBirthdayOf(Employee $employee): Greeting
     {
-        $content = "Happy Birthday, dear $employee->firstName!";
         $header = "Happy Birthday!";
+        $content = "Happy Birthday, dear {$employee->getFirstName()}!";
         return new Greeting($header, $content);
     }
 
-    public function header(): string
+    public function getHeader(): string
     {
         return $this->header;
     }
 
-    public function content(): string
+    public function getContent(): string
     {
         return $this->content;
     }

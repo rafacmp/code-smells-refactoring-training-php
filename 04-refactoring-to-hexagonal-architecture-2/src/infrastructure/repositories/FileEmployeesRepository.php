@@ -18,14 +18,17 @@ class FileEmployeesRepository implements EmployeeRepository
         $this->path = $path;
     }
 
-    function whoseBirthdayIs(OurDate $today): array
+    public function employeesWhoseBirthdayIs(OurDate $date): array
     {
-        return array_filter($this->allEmployees(), function(Employee $employee) use ($today){
-           return $employee->isBirthday($today);
-        });
+        return array_filter(
+            $this->allEmployees(),
+            function (Employee $employee) use ($date) {
+                return $employee->isBirthday($date);
+            }
+        );
     }
 
-    private function allEmployees()
+    private function allEmployees(): array
     {
         $employees = [];
         $fileHandler = $this->openFile();
@@ -51,11 +54,7 @@ class FileEmployeesRepository implements EmployeeRepository
         return $fileHandler;
     }
 
-    /**
-     * @param $employeeData
-     * @return mixed
-     */
-    private function getExtractDate($employeeData)
+    private function getExtractDate($employeeData): OurDate
     {
         $dateAsString = $employeeData[2];
         try {

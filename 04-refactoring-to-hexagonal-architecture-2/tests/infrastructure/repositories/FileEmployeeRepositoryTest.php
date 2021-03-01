@@ -24,7 +24,7 @@ class FileEmployeeRepositoryTest extends TestCase
         $this->expectExceptionMessageMatches("/cannot loadFrom file/");
         $this->expectExceptionMessageMatches("/non-existing.file/");
 
-        $employeeRepository->whoseBirthdayIs($this->ANY_DATE);
+        $employeeRepository->employeesWhoseBirthdayIs($this->ANY_DATE);
     }
 
     public function test_fails_when_the_file_does_not_have_the_necessary_fields(): void
@@ -34,6 +34,6 @@ class FileEmployeeRepositoryTest extends TestCase
         $this->expectException(CannotReadEmployeesException::class);
         $this->expectExceptionMessageMatches("/Badly formatted employee birth date in: '2016-01-01'/");
 
-        $employeeRepository->whoseBirthdayIs($this->ANY_DATE);
+        $employeeRepository->employeesWhoseBirthdayIs($this->ANY_DATE);
     }
 }
