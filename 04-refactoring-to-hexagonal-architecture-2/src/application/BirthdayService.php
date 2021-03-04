@@ -6,7 +6,6 @@ declare(strict_types=1);
 namespace App\application;
 
 
-use App\core\Employee;
 use App\core\EmployeeRepository;
 use App\core\GreetingMessage;
 use App\core\OurDate;
