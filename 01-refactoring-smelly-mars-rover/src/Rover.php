@@ -70,16 +70,4 @@ class Rover
             }
         }
     }
-
-    public function equals(Rover $rover): bool
-    {
-        if ($this->y !== $rover->y) {
-            return false;
-        }
-        if ($this->x !== $rover->x) {
-            return false;
-        }
-
-        return $this->direction === $rover->direction;
-    }
 }
