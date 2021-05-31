@@ -29,13 +29,13 @@ class BirthdayService
         string $sender
     ): void {
 
-        $this->send($this->greetingMessageFor($this->employeesHavingBirthday($date)),
+        $this->send($this->greetingMessagesFor($this->employeesHavingBirthday($date)),
                     $smtpHost, $smtpPort, $sender);
     }
 
-    private function greetingMessageFor($employee): array
+    private function greetingMessagesFor(array $employees): array
     {
-        return GreetingMessage::generateForSome($employee);
+        return GreetingMessage::generateForSome($employees);
     }
 
     private function employeesHavingBirthday($today): array
