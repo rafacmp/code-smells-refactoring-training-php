@@ -17,18 +17,17 @@ class BirthdayService
         OurDate $ourDate,
         string $smtpHost,
         int $smtpPort
-    ): void {
-        $fileHandler = fopen($fileName, 'rb');
-        fgetcsv($fileHandler);
-        while ($employeeData = fgetcsv($fileHandler, null)) {
-            $employeeData = array_map('trim', $employeeData);
-            $employee = new Employee($employeeData[1], $employeeData[0], $employeeData[2], $employeeData[3]);
-            if ($employee->isBirthday($ourDate)) {
-                $recipient = $employee->getEmail();
-                $body = sprintf('Happy Birthday, dear %s!', $employee->getFirstName());
-                $subject = 'Happy Birthday!';
-                $this->sendMessage($smtpHost, $smtpPort, 'sender@here.com', $subject, $body, $recipient);
-            }
+    ): void
+    {
+        $employees = $this->getEmployees($fileName);
+
+        $employeesBirthdays = $this->filterEmployeesHavingBirthdayOn($ourDate, $employees);
+
+        foreach ($employeesBirthdays as $employee) {
+            $recipient = $employee->getEmail();
+            $body = sprintf('Happy Birthday, dear %s!', $employee->getFirstName());
+            $subject = 'Happy Birthday!';
+            $this->sendMessage($smtpHost, $smtpPort, 'sender@here.com', $subject, $body, $recipient);
         }
     }
 
@@ -55,6 +54,33 @@ class BirthdayService
     protected function send(Swift_Message $msg, Swift_Mailer $mailer)
     {
         $mailer->send($msg);
+    }
+
+    private function getEmployees(string $fileName): array
+    {
+        $fileHandler = fopen($fileName, 'rb');
+        fgetcsv($fileHandler);
+
+        $employees = [];
+        while ($employeeData = fgetcsv($fileHandler, null)) {
+            $employeeData = array_map('trim', $employeeData);
+            $employee = new Employee($employeeData[1], $employeeData[0], $employeeData[2], $employeeData[3]);
+            $employees[] = $employee;
+
+        }
+        return $employees;
+    }
+
+    private function filterEmployeesHavingBirthdayOn(OurDate $ourDate, array $employees): array
+    {
+        $employeesBirthdays = [];
+
+        foreach ($employees as $employee) {
+            if ($employee->isBirthday($ourDate)) {
+                $employeesBirthdays[] = $employee;
+            }
+        }
+        return $employeesBirthdays;
     }
 
 }
