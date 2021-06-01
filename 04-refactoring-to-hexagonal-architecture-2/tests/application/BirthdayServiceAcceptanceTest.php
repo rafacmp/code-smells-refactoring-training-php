@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\application\BirthdayService;
-use App\core\EmployeeRepository;
+use App\infrastructure\EmailGreetingsSender;
 use App\infrastructure\repositories\FileEmployeesRepository;
 use helpers\OurDateFactory;
 use PHPUnit\Framework\TestCase;
@@ -15,37 +15,40 @@ class BirthdayServiceAcceptanceTest extends TestCase
     private const FROM = 'sender@here.com';
     private BirthdayService $service;
     private const EMPLOYEES_FILE_PATH = "/../resources/employee_data.txt";
+    private $emailGreetingSender;
 
     protected function setUp(): void
     {
         $employeesFilePath = dirname(__FILE__) . self::EMPLOYEES_FILE_PATH;
-        $this->service = new class([], new FileEmployeesRepository($employeesFilePath)) extends BirthdayService {
+        $this->emailGreetingSender = new class([], self::SMTP_HOST, self::SMTP_PORT, self::FROM) extends EmailGreetingsSender {
 
             public $messagesSent;
 
-            public function __construct($messagesSent, EmployeeRepository $employeeRepository)
+            public function __construct($messagesSent, string $smtpHost, int $smtpPort, string $sender)
             {
-                parent::__construct($employeeRepository);
+                parent::__construct($smtpHost, $smtpPort, $sender);
                 $this->messagesSent = $messagesSent;
             }
 
-            protected function sendMessage(Swift_Message $msg, Swift_Mailer $mailer)
+            public function sendMessage(Swift_Message $msg, Swift_Mailer $mailer)
             {
                 $this->messagesSent[] = $msg;
             }
 
         };
+
+        $this->service = new BirthdayService(new FileEmployeesRepository($employeesFilePath), $this->emailGreetingSender);
     }
 
     public function testBaseScenario(): void
     {
         $today = OurDateFactory::ourDateFromString("2008/10/08");
 
-        $this->service->sendGreetings($today, self::SMTP_HOST, self::SMTP_PORT, self::FROM);
+        $this->service->sendGreetings($today);
 
-        $this->assertEquals(1, count($this->service->messagesSent), "message not sent?");
+        $this->assertEquals(1, count($this->emailGreetingSender->messagesSent), "message not sent?");
         /* @var Swift_Message $message */
-        $message = $this->service->messagesSent[0];
+        $message = $this->emailGreetingSender->messagesSent[0];
         $this->assertEquals("Happy Birthday, dear John!", $message->getBody());
         $this->assertEquals("Happy Birthday!", $message->getSubject());
         $this->assertEquals(1, count($message->getTo()));
@@ -57,12 +60,9 @@ class BirthdayServiceAcceptanceTest extends TestCase
         $today = OurDateFactory::ourDateFromString('2008/01/01');
 
         $this->service->sendGreetings(
-            $today,
-            self::SMTP_HOST,
-            self::SMTP_PORT,
-            self::FROM
+            $today
         );
 
-        $this->assertEquals(0, count($this->service->messagesSent), 'what? messages?');
+        $this->assertEquals(0, count($this->emailGreetingSender->messagesSent), 'what? messages?');
     }
 }
