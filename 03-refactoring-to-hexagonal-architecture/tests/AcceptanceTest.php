@@ -15,10 +15,8 @@ class AcceptanceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->service = new class(new FileEmployeeRepository()) extends BirthdayService {
+        $this->service = new class(new FileEmployeeRepository(dirname(__FILE__) . '/resources/employee_data.txt')) extends BirthdayService {
             private array $messageSent = [];
-
-
 
             protected function send(Swift_Message $msg, Swift_Mailer $mailer): void
             {
@@ -40,10 +38,7 @@ class AcceptanceTest extends TestCase
     public function testWillSendGreetings_whenItsSomebodysBirthday(): void
     {
         $this->service->sendGreetings(
-            dirname(__FILE__) . '/resources/employee_data.txt',
-            new OurDate('2008/10/08'),
-            static::SMTP_HOST,
-            static::SMTP_PORT
+            new OurDate('2008/10/08'), static::SMTP_HOST, static::SMTP_PORT
         );
 
         $this->assertEquals(1, $this->service->count(), 'message not sent?');
@@ -57,10 +52,7 @@ class AcceptanceTest extends TestCase
     public function testWillNotSendEmailsWhenNobodysBirthday(): void
     {
         $this->service->sendGreetings(
-            dirname(__FILE__) . '/resources/employee_data.txt',
-            new OurDate('2008/01/01'),
-            static::SMTP_HOST,
-            static::SMTP_PORT
+            new OurDate('2008/01/01'), static::SMTP_HOST, static::SMTP_PORT
         );
 
         $this->assertEquals(0, $this->service->count(), 'what? messages?');

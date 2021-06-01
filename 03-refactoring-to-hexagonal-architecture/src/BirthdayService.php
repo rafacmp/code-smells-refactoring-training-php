@@ -14,22 +14,18 @@ class BirthdayService
 {
     private EmployeeRepository $employeeRepository;
 
-    public function __construct(EmployeeRepository $employeeRepository = null)
+    public function __construct(EmployeeRepository $employeeRepository)
     {
-
-        $this->employeeRepository = $employeeRepository ?? new FileEmployeeRepository();
+        $this->employeeRepository = $employeeRepository;
     }
 
     // extract get clients from CSV
     // iterate and check for birthdays
     // send an email
     public function sendGreetings(
-        string $fileName,
-        OurDate $ourDate,
-        string $smtpHost,
-        int $smtpPort
+        OurDate $ourDate, string $smtpHost, int $smtpPort
     ): void {
-        $employees = $this->employeeRepository->getEmployees($fileName);
+        $employees = $this->employeeRepository->getEmployees();
 
         $birthdayEmployees = $this->birthdayEmployees($employees, $ourDate);
 

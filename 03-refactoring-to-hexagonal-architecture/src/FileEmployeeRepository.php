@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App;
-
 
 
 class FileEmployeeRepository implements EmployeeRepository
@@ -17,9 +15,9 @@ class FileEmployeeRepository implements EmployeeRepository
         $this->fileName = $fileName;
     }
 
-    public function getEmployees($fileName): array
+    public function getEmployees(): array
     {
-        $fileHandler = fopen($fileName, 'rb');
+        $fileHandler = fopen($this->fileName, 'rb');
         fgetcsv($fileHandler);
 
         $employees = [];
