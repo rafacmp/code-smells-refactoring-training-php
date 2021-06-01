@@ -12,26 +12,41 @@ use Swift_SmtpTransport;
 
 class BirthdayService
 {
+    // extract get clients from CSV
+    // iterate and check for birthdays
+    // send an email
     public function sendGreetings(
         string $fileName,
         OurDate $ourDate,
         string $smtpHost,
         int $smtpPort
     ): void {
+        $employees = $this->getEmployees($fileName);
+
+        $birthdayEmployees = $this->birthdayEmployees($employees, $ourDate);
+
+        $greetings = $this->getGreetings($birthdayEmployees);
+
+        $this->sendGreetingsToEmployees($greetings, $smtpHost, $smtpPort);
+    }
+
+    private function getEmployees($fileName) {
         $fileHandler = fopen($fileName, 'rb');
         fgetcsv($fileHandler);
+
+        $employees = [];
         while ($employeeData = fgetcsv($fileHandler, null)) {
             $employeeData = array_map('trim', $employeeData);
             $employee = new Employee($employeeData[1], $employeeData[0], $employeeData[2], $employeeData[3]);
-            if ($employee->isBirthday($ourDate)) {
-                $recipient = $employee->getEmail();
-                $body = sprintf('Happy Birthday, dear %s!', $employee->getFirstName());
-                $subject = 'Happy Birthday!';
-                $this->sendMessage($smtpHost, $smtpPort, 'sender@here.com', $subject, $body, $recipient);
-            }
+
+            $employees[] = $employee;
         }
+
+        return $employees;
     }
 
+    // This method should not be here
+    // The method should not know about the implementation
     protected function sendMessage(
         string $smtpHost,
         int $smtpPort,
@@ -55,6 +70,51 @@ class BirthdayService
     protected function send(Swift_Message $msg, Swift_Mailer $mailer)
     {
         $mailer->send($msg);
+    }
+
+    /**
+     * @param array $employees
+     * @param OurDate $ourDate
+     * @return array
+     */
+    public function birthdayEmployees(array $employees, OurDate $ourDate): array
+    {
+        $employeesWhoseBirthdayIsOurDate = [];
+        foreach ($employees as $employee) {
+            if ($employee->isBirthday($ourDate)) {
+                $employeesWhoseBirthdayIsOurDate[] = $employee;
+            }
+        }
+        return $employeesWhoseBirthdayIsOurDate;
+    }
+
+    /**
+     * @param array $greetings
+     * @param string $smtpHost
+     * @param int $smtpPort
+     */
+    public function sendGreetingsToEmployees(array $greetings, string $smtpHost, int $smtpPort): void
+    {
+        foreach ($greetings as $greeting) {
+            $this->sendMessage($smtpHost, $smtpPort, 'sender@here.com', $greeting['subject'], $greeting['body'], $greeting['recipient']);
+        }
+    }
+
+    /**
+     * @param array $employeesWhoseBirthdayIsOurDate
+     * @return array
+     */
+    public function getGreetings(array $employeesWhoseBirthdayIsOurDate): array
+    {
+        $greetings = [];
+        foreach ($employeesWhoseBirthdayIsOurDate as $employeeWhoseBirthdayIsOurDate) {
+            $greetings[] = [
+                'recipient' => $employeeWhoseBirthdayIsOurDate->getEmail(),
+                'body' => sprintf('Happy Birthday, dear %s!', $employeeWhoseBirthdayIsOurDate->getFirstName()),
+                'subject' => 'Happy Birthday!'
+            ];
+        }
+        return $greetings;
     }
 
 }
