@@ -12,6 +12,13 @@ use Swift_SmtpTransport;
 
 class BirthdayService
 {
+    private FileEmployeeRepository $employeeRepository;
+
+    public function __construct()
+    {
+        $this->employeeRepository = new FileEmployeeRepository();
+    }
+
     // extract get clients from CSV
     // iterate and check for birthdays
     // send an email
@@ -21,28 +28,13 @@ class BirthdayService
         string $smtpHost,
         int $smtpPort
     ): void {
-        $employees = $this->getEmployees($fileName);
+        $employees = $this->employeeRepository->getEmployees($fileName);
 
         $birthdayEmployees = $this->birthdayEmployees($employees, $ourDate);
 
         $greetings = $this->getGreetings($birthdayEmployees);
 
         $this->sendGreetingsToEmployees($greetings, $smtpHost, $smtpPort);
-    }
-
-    private function getEmployees($fileName) {
-        $fileHandler = fopen($fileName, 'rb');
-        fgetcsv($fileHandler);
-
-        $employees = [];
-        while ($employeeData = fgetcsv($fileHandler, null)) {
-            $employeeData = array_map('trim', $employeeData);
-            $employee = new Employee($employeeData[1], $employeeData[0], $employeeData[2], $employeeData[3]);
-
-            $employees[] = $employee;
-        }
-
-        return $employees;
     }
 
     // This method should not be here
