@@ -4,12 +4,19 @@
 namespace App;
 
 
-class FileEmployeesRepository
+class FileEmployeesRepository implements EmployeesRepository
 {
 
-    public function getEmployees(string $fileName): array
+    private string $fileName;
+
+    public function __construct(string $fileName)
     {
-        $fileHandler = fopen($fileName, 'rb');
+        $this->fileName = $fileName;
+    }
+
+    public function getEmployees(): array
+    {
+        $fileHandler = fopen($this->fileName, 'rb');
         fgetcsv($fileHandler);
 
         $employees = [];

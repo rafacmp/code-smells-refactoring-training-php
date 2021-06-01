@@ -12,21 +12,20 @@ use Swift_SmtpTransport;
 
 class BirthdayService
 {
-    private FileEmployeesRepository $fileEmployeesRepository;
+    private EmployeesRepository $employeesRepository;
 
-    public function __construct()
+    public function __construct(EmployeesRepository $employeesRepository)
     {
-        $this->fileEmployeesRepository = new FileEmployeesRepository();
+        $this->employeesRepository = $employeesRepository;
     }
 
     public function sendGreetings(
-        string $fileName,
         OurDate $ourDate,
         string $smtpHost,
         int $smtpPort
     ): void
     {
-        $employees = $this->getEmployees($fileName);
+        $employees = $this->employeesRepository->getEmployees();
 
         $employeesBirthdays = $this->filterEmployeesHavingBirthdayOn($ourDate, $employees);
 
@@ -61,11 +60,6 @@ class BirthdayService
     protected function send(Swift_Message $msg, Swift_Mailer $mailer)
     {
         $mailer->send($msg);
-    }
-
-    private function getEmployees(string $fileName): array
-    {
-        return $this->fileEmployeesRepository->getEmployees($fileName);
     }
 
     private function filterEmployeesHavingBirthdayOn(OurDate $ourDate, array $employees): array
