@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\BirthdayService;
+use App\FileEmployeeRepository;
 use App\OurDate;
 use PHPUnit\Framework\TestCase;
 
@@ -14,8 +15,10 @@ class AcceptanceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->service = new class() extends BirthdayService {
+        $this->service = new class(new FileEmployeeRepository()) extends BirthdayService {
             private array $messageSent = [];
+
+
 
             protected function send(Swift_Message $msg, Swift_Mailer $mailer): void
             {

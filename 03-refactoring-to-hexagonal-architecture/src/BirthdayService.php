@@ -12,11 +12,12 @@ use Swift_SmtpTransport;
 
 class BirthdayService
 {
-    private FileEmployeeRepository $employeeRepository;
+    private EmployeeRepository $employeeRepository;
 
-    public function __construct()
+    public function __construct(EmployeeRepository $employeeRepository = null)
     {
-        $this->employeeRepository = new FileEmployeeRepository();
+
+        $this->employeeRepository = $employeeRepository ?? new FileEmployeeRepository();
     }
 
     // extract get clients from CSV
