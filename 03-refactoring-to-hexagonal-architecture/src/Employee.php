@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-
 namespace App;
 
+use DateTime;
 
 class Employee
 {
@@ -13,11 +13,11 @@ class Employee
     private string $firstName;
     private string $email;
 
-    public function __construct(string $firstName, string $lastName, string $birthDate, string $email)
+    public function __construct(string $firstName, string $lastName, string $email, OurDate $birthDate)
     {
         $this->firstName = $firstName;
         $this->lastName = $lastName;
-        $this->birthDate = new OurDate($birthDate);
+        $this->birthDate = $birthDate;
         $this->email = $email;
     }
 

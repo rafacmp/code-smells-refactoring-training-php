@@ -2,24 +2,20 @@
 
 declare(strict_types=1);
 
-
 namespace App;
-
 
 use DateTime;
 
 class OurDate
 {
-
     private DateTime $date;
 
-    public function __construct(string $yyyyMMdd)
+    public function __construct($date = null)
     {
-        try {
-            $this->date = DateTime::createFromFormat('Y/m/d H:i:s', $yyyyMMdd . ' 00:00:00');
-        } catch (\Throwable $e) {
+        if (!$date instanceof DateTime) {
             throw new \InvalidArgumentException('ParseException');
         }
+        $this->date = $date;
     }
 
     public function isSameDay($anotherDate): bool

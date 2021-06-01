@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-
 namespace App;
-
 
 use Swift_Mailer;
 use Swift_Message;
@@ -24,7 +22,8 @@ class BirthdayService
     // send an email
     public function sendGreetings(
         OurDate $ourDate, string $smtpHost, int $smtpPort
-    ): void {
+    ): void
+    {
         $employees = $this->employeeRepository->getEmployees();
 
         $birthdayEmployees = $this->birthdayEmployees($employees, $ourDate);
@@ -36,36 +35,7 @@ class BirthdayService
 
     // This method should not be here
     // The method should not know about the implementation
-    protected function sendMessage(
-        string $smtpHost,
-        int $smtpPort,
-        string $sender,
-        string $subject,
-        string $body,
-        string $recipient
-    ): void {
-        $mailer = new Swift_Mailer(
-            new Swift_SmtpTransport($smtpHost, $smtpPort)
-        );
-        $msg = new Swift_Message($subject);
-        $msg->setFrom($sender)
-            ->setTo([$recipient])
-            ->setBody($body);
 
-
-        $this->send($msg, $mailer);
-    }
-
-    protected function send(Swift_Message $msg, Swift_Mailer $mailer)
-    {
-        $mailer->send($msg);
-    }
-
-    /**
-     * @param array $employees
-     * @param OurDate $ourDate
-     * @return array
-     */
     public function birthdayEmployees(array $employees, OurDate $ourDate): array
     {
         $employeesWhoseBirthdayIsOurDate = [];
@@ -77,22 +47,6 @@ class BirthdayService
         return $employeesWhoseBirthdayIsOurDate;
     }
 
-    /**
-     * @param array $greetings
-     * @param string $smtpHost
-     * @param int $smtpPort
-     */
-    public function sendGreetingsToEmployees(array $greetings, string $smtpHost, int $smtpPort): void
-    {
-        foreach ($greetings as $greeting) {
-            $this->sendMessage($smtpHost, $smtpPort, 'sender@here.com', $greeting['subject'], $greeting['body'], $greeting['recipient']);
-        }
-    }
-
-    /**
-     * @param array $employeesWhoseBirthdayIsOurDate
-     * @return array
-     */
     public function getGreetings(array $employeesWhoseBirthdayIsOurDate): array
     {
         $greetings = [];
@@ -104,6 +58,38 @@ class BirthdayService
             ];
         }
         return $greetings;
+    }
+
+    public function sendGreetingsToEmployees(array $greetings, string $smtpHost, int $smtpPort): void
+    {
+        foreach ($greetings as $greeting) {
+            $this->sendMessage($smtpHost, $smtpPort, 'sender@here.com', $greeting['subject'], $greeting['body'], $greeting['recipient']);
+        }
+    }
+
+    protected function sendMessage(
+        string $smtpHost,
+        int $smtpPort,
+        string $sender,
+        string $subject,
+        string $body,
+        string $recipient
+    ): void
+    {
+        $mailer = new Swift_Mailer(
+            new Swift_SmtpTransport($smtpHost, $smtpPort)
+        );
+        $msg = new Swift_Message($subject);
+        $msg->setFrom($sender)
+            ->setTo([$recipient])
+            ->setBody($body);
+
+        $this->send($msg, $mailer);
+    }
+
+    protected function send(Swift_Message $msg, Swift_Mailer $mailer)
+    {
+        $mailer->send($msg);
     }
 
 }
